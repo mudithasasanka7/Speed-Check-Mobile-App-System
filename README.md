@@ -14,7 +14,7 @@
 ---
 
 ## 📸 Screenshots
-<img src="1.png" width="40%">
+<img src="Screenshot (1).png" width="40%">
 
 ---
 
