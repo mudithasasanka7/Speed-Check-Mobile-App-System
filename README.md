@@ -37,4 +37,9 @@
 ## 🛡️ Permissions
 - The app requires the following permissions to function:
   - ACCESS_FINE_LOCATION: For precise location and speed calculations.
+ 
+---
+
+## 🤝 Contributing
+This app was developed by <a href="https://www.linkedin.com/in/mudithasasanka7/"> Mudita </a> and <a href="https://www.linkedin.com/in/harsha-hewa-maddumage-52520a1ba/">Harsha</a>. We welcome contributions! Feel free to fork this repository, make changes, and submit a pull request.
 
