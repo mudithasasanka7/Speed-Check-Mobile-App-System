@@ -15,7 +15,7 @@
 
 ## 📸 Screenshots
 <img src="Screenshot (1).png" width="40%">
-<img scr="Screenshot 2024-12-28 212910.png" width="40%">
+<img src="Screenshot 2024-12-28 212910.png" width="40%">
 
 ---
 
