@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
         speedometer = findViewById(R.id.speedometer);
         speedValue = findViewById(R.id.speedValue);
 
+
         // Initialize Location Manager
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 

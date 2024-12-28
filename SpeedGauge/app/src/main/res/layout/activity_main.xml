@@ -5,21 +5,27 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
-    android:background="#ffffff"
+    android:background="#000000"
     tools:context=".MainActivity">
 
     <!-- PointerSpeedometer -->
     <com.github.anastr.speedviewlib.PointerSpeedometer
         android:id="@+id/speedometer"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
+        android:layout_width="350dp"
+        android:layout_height="350dp"
         android:layout_centerInParent="true"
+        app:sv_indicator="NeedleIndicator"
+        app:sv_backgroundCircleColor="#1E1E1E"
+        app:sv_markColor="#FF0000"
+        app:sv_indicatorColor="#FF0000"
+        app:sv_speedTextColor="#FDDC03"
         app:sv_maxSpeed="140"
         app:sv_minSpeed="0"
+        app:sv_speedometerColor="#4BF44F"
+        app:sv_centerCircleColor="#FF4800"
+        app:sv_unitTextColor="#8B2000"
         app:sv_unit="km/h"
-        app:sv_withTremble="true"
-        app:sv_speedometerColor="#2196F3"
-        app:sv_indicator="NeedleIndicator" />
+        app:sv_withTremble="true" />
 
     <!-- Value Display -->
     <TextView
@@ -28,10 +34,10 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/speedometer"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="40dp"
         android:text="Speed: 0 km/h"
-        android:textSize="18sp"
+        android:textSize="40sp"
         android:textStyle="bold"
-        android:textColor="#000000" />
+        android:textColor="#FFFFFF" />
 
 </RelativeLayout>
