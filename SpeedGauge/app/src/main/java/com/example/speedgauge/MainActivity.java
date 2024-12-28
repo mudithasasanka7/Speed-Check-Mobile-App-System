@@ -9,6 +9,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.core.app.ActivityCompat;
@@ -26,6 +27,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        PointerSpeedometer speedometer = findViewById(R.id.speedometer);
+
+
+
+        hideNavigationBar();
         // Initialize Views
         speedometer = findViewById(R.id.speedometer);
         speedValue = findViewById(R.id.speedValue);
@@ -36,6 +42,13 @@ public class MainActivity extends AppCompatActivity {
 
         // Request Location Updates
         requestLocationUpdates();
+    }
+    private void hideNavigationBar() {
+        getWindow().getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // Hides the navigation bar
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN    // Hides the status bar
+                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY // Ensures navigation bar stays hidden
+        );
     }
 
 
