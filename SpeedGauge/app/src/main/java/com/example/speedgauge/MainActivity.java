@@ -3,18 +3,24 @@ package com.example.speedgauge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.TypedValue;
 import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.core.app.ActivityCompat;
 import com.github.anastr.speedviewlib.PointerSpeedometer;
 import android.view.WindowManager;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
@@ -27,22 +33,27 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        PointerSpeedometer speedometer = findViewById(R.id.speedometer);
 
-
-
+        animatePointerOnStart();
         hideNavigationBar();
+
         // Initialize Views
         speedometer = findViewById(R.id.speedometer);
         speedValue = findViewById(R.id.speedValue);
 
-
         // Initialize Location Manager
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
-        // Request Location Updates
-        requestLocationUpdates();
+        // Check if GPS is enabled and request Location Updates
+        checkAndEnableGPS();
     }
+
+    private void animatePointerOnStart() {
+        // Move pointer to maximum speed and back to 0 with animation
+        new Handler().postDelayed(() -> speedometer.speedTo(180, 2000), 500); // Go to 180 in 2 seconds after 0.5s delay
+        new Handler().postDelayed(() -> speedometer.speedTo(0, 2000), 3000);  // Back to 0 in 2 seconds after reaching 180
+    }
+
     private void hideNavigationBar() {
         getWindow().getDecorView().setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // Hides the navigation bar
@@ -51,6 +62,18 @@ public class MainActivity extends AppCompatActivity {
         );
     }
 
+    private void checkAndEnableGPS() {
+        if (!isGPSEnabled()) {
+            // If GPS is disabled, prompt user to enable it
+            Intent intent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+            startActivity(intent);
+        }
+        requestLocationUpdates();
+    }
+
+    private boolean isGPSEnabled() {
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+    }
 
     private void requestLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -65,14 +88,31 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private final LocationListener locationListener = new LocationListener() {
+
+
         @Override
         public void onLocationChanged(@NonNull Location location) {
+
             if (location.hasSpeed()) {
                 // Convert speed from m/s to km/h
                 float speedInKmH = location.getSpeed() * 3.6f;
                 // Update Speedometer and TextView
                 speedometer.speedTo(speedInKmH);
                 speedValue.setText("Speed: " + Math.round(speedInKmH) + " km/h");
+                if (speedInKmH > 40) {
+                    // Change color to orange or red if speed > 40
+                    if (speedInKmH > 80) {
+                         // Speed > 80, red color
+                        speedometer.setSpeedometerColor(Color.parseColor("#ff1100"));
+                    } else {
+                          // Speed > 40 but <= 80, orange color
+                        speedometer.setSpeedometerColor(Color.parseColor("#FFA500"));
+                    }
+                } else {
+                    // Default color for speed <= 40
+                    speedometer.setSpeedometerColor(Color.parseColor("#4BF44F")); // Example: Green color
+
+                }
             }
         }
 
@@ -112,14 +152,49 @@ public class MainActivity extends AppCompatActivity {
             locationManager.removeUpdates(locationListener);
         }
     }
+
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            Toast.makeText(this, "Landscape mode", Toast.LENGTH_SHORT).show();
+            //Landscape mode acticity
+            changeSpeedometerWidth(300);
+            adjustLayoutForLandscape();
+            changeSpeedTextSize(35);
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            Toast.makeText(this, "Portrait mode", Toast.LENGTH_SHORT).show();
+            // Portrait mode acticity
+            changeSpeedometerWidth(350);
+            changeSpeedTextSize(45);
+            adjustLayoutForPortrait();
         }
     }
+    private void changeSpeedometerWidth(int widthInDp) {
+        // Convert dp to pixels
+        int widthInPx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, widthInDp, getResources().getDisplayMetrics());
 
+        // Get current layout params of the speedometer
+        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) speedometer.getLayoutParams();
+        layoutParams.width = widthInPx;  // Set the new width in pixels
+        speedometer.setLayoutParams(layoutParams);  // Apply the new layout parameters
+    }
+    private void changeSpeedTextSize(float textSizeInSp) {
+        float textSizeInPx = textSizeInSp * getResources().getDisplayMetrics().scaledDensity;
+        speedometer.setSpeedTextSize(textSizeInPx);
+    }
+    private void adjustLayoutForLandscape() {
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) speedValue.getLayoutParams();
+        params.removeRule(RelativeLayout.BELOW); // Remove positioning below the gauge
+        params.addRule(RelativeLayout.RIGHT_OF, R.id.speedometer); // Position to the right of the gauge
+        params.setMargins(0, 20, 0, 0);
+        changeSpeedTextSize(25);
+        speedValue.setLayoutParams(params);
+    }
+
+    private void adjustLayoutForPortrait() {
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) speedValue.getLayoutParams();
+        params.removeRule(RelativeLayout.RIGHT_OF); // Remove positioning to the right
+        params.addRule(RelativeLayout.BELOW, R.id.speedometer); // Position below the gauge
+        params.setMargins(0, 20, 0, 0); // Add top margin for spacing
+        speedValue.setLayoutParams(params);
+    }
 }
