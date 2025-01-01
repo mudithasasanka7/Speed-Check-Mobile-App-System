@@ -21,17 +21,26 @@ import androidx.core.app.ActivityCompat;
 import com.github.anastr.speedviewlib.PointerSpeedometer;
 import android.view.WindowManager;
 
+import java.util.Locale;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private PointerSpeedometer speedometer;
     private TextView speedValue;
     private LocationManager locationManager;
+    private Location previousLocation = null; // Stores the last known location
+    private double totalDistance = 0.0;       // Tracks the total distance in meters
+    private TextView distanceValue;          // TextView to display distance
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        distanceValue = findViewById(R.id.distanceValue); // Replace with the actual TextView ID
+        distanceValue.setText("Distance: 0.0 km");        // Initial display value
+
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         animatePointerOnStart();
@@ -111,9 +120,17 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     // Default color for speed <= 40
                     speedometer.setSpeedometerColor(Color.parseColor("#4BF44F")); // Example: Green color
-
                 }
             }
+            // Distance calculation
+            if (previousLocation != null) {
+                float distance = previousLocation.distanceTo(location); // Distance in meters
+                totalDistance += distance; // Add to total distance
+                double distanceInKm = totalDistance / 1000.0; // Convert to kilometers
+                distanceValue.setText(String.format(Locale.getDefault(), "Distance: %.2f km", distanceInKm));
+            }
+
+            previousLocation = location; // Update previous location
         }
 
         @Override
